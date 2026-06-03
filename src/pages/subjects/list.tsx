@@ -16,32 +16,48 @@ import { Subject } from "@/types";
 import { useTable } from "@refinedev/react-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const SubjectsList = () => {
+  const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("all");
 
-  const departmentFilters =
-    selectedDepartment === "all"
-      ? []
-      : [
-          {
-            field: "department",
-            operator: "eq" as const,
-            value: selectedDepartment,
-          },
-        ];
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setSearchQuery(searchInput);
+    }, 300);
 
-  const searchFilter = searchQuery
-    ? [
-        {
-          field: "name",
-          operator: "contains" as const,
-          value: searchQuery,
-        },
-      ]
-    : [];
+    return () => clearTimeout(id);
+  }, [searchInput]);
+
+  const departmentFilters = useMemo(
+    () =>
+      selectedDepartment === "all"
+        ? []
+        : [
+            {
+              field: "department",
+              operator: "eq" as const,
+              value: selectedDepartment,
+            },
+          ],
+    [selectedDepartment],
+  );
+
+  const searchFilter = useMemo(
+    () =>
+      searchQuery
+        ? [
+            {
+              field: "name",
+              operator: "contains" as const,
+              value: searchQuery,
+            },
+          ]
+        : [],
+    [searchQuery],
+  );
 
   const subjectTable = useTable<Subject>({
     columns: useMemo<ColumnDef<Subject>[]>(
@@ -116,8 +132,8 @@ const SubjectsList = () => {
               type="text"
               placeholder="Search by name..."
               className="pl-10 w-full"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
             />
           </div>
 

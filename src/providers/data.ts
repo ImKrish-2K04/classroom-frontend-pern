@@ -1,4 +1,5 @@
 import { MOCK_SUBJECTS } from "@/constants/mock-data";
+import { Subject } from "@/types";
 import {
   BaseRecord,
   DataProvider,
@@ -20,7 +21,7 @@ export const dataProvider: DataProvider = {
       };
     }
 
-    let data = [...MOCK_SUBJECTS];
+    let data: Subject[] = [...MOCK_SUBJECTS];
 
     // FILTERING
     if (filters) {
@@ -50,15 +51,15 @@ export const dataProvider: DataProvider = {
     // SORTING
     if (sorters?.length) {
       const sorter = sorters[0];
-
       data.sort((a, b) => {
-        const aValue = a[sorter.field as keyof typeof a];
-        const bValue = b[sorter.field as keyof typeof b];
+        const aValue = a[sorter.field as keyof Subject];
+        const bValue = b[sorter.field as keyof Subject];
 
+        if (aValue === null && bValue === null) return 0;
+        if (aValue === null) return sorter.order === "asc" ? 1 : -1;
+        if (bValue === null) return sorter.order === "asc" ? -1 : 1;
         if (aValue < bValue) return sorter.order === "asc" ? -1 : 1;
-
         if (aValue > bValue) return sorter.order === "asc" ? 1 : -1;
-
         return 0;
       });
     }
@@ -66,7 +67,6 @@ export const dataProvider: DataProvider = {
     // PAGINATION
     const current = pagination?.currentPage || 1;
     const pageSize = pagination?.pageSize || 10;
-
     const start = (current - 1) * pageSize;
     const end = start + pageSize;
 
@@ -96,13 +96,3 @@ export const dataProvider: DataProvider = {
 
   getApiUrl: () => "",
 };
-
-/*
-? original:
-
-import { createSimpleRestDataProvider } from "@refinedev/rest/simple-rest";
-import { API_URL } from "./constants";
-export const { dataProvider, kyInstance } = createSimpleRestDataProvider({
-  apiURL: API_URL,
-});
-*/
