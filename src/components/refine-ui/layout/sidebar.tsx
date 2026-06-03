@@ -212,6 +212,7 @@ function SidebarItemLink({ item, selectedKey }: MenuItemProps) {
 function SidebarHeader() {
   const { title } = useRefineOptions();
   const { open, isMobile } = useShadcnSidebar();
+  const isExpanded = open || isMobile;
 
   return (
     <ShadcnSidebarHeader
@@ -238,21 +239,22 @@ function SidebarHeader() {
           "transition-discrete",
           "duration-200",
           {
-            "pl-3": !open,
-            "pl-5": open,
+            "pl-3": !isExpanded,
+            "pl-5": isExpanded,
           }
         )}
       >
-        <div>{title.icon}</div>
+        <div className={cn("shrink-0")}>{title.icon}</div>
         <h2
           className={cn(
             "text-sm",
             "font-bold",
+            "overflow-hidden",
             "transition-opacity",
             "duration-200",
             {
-              "opacity-0": !open,
-              "opacity-100": open,
+              "opacity-0": !isExpanded,
+              "opacity-100": isExpanded,
             }
           )}
         >
