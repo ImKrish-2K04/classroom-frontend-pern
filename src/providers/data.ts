@@ -1,98 +1,42 @@
-import { MOCK_SUBJECTS } from "@/constants/mock-data";
-import { Subject } from "@/types";
-import {
-  BaseRecord,
-  DataProvider,
-  GetListParams,
-  GetListResponse,
-} from "@refinedev/core";
+import { BACKEND_BASE_URL } from "@/constants";
+import { ListResponse } from "@/types";
+import { createDataProvider, CreateDataProviderOptions } from "@refinedev/rest";
 
-export const dataProvider: DataProvider = {
-  getList: async <TData extends BaseRecord = BaseRecord>({
-    resource,
-    pagination,
-    filters,
-    sorters,
-  }: GetListParams): Promise<GetListResponse<TData>> => {
-    if (resource !== "subjects") {
-      return {
-        data: [],
-        total: 0,
-      };
-    }
+const options: CreateDataProviderOptions = {
+  getList: {
+    getEndpoint: ({ resource }) => resource,
 
-    let data: Subject[] = [...MOCK_SUBJECTS];
+    buildQueryParams: async ({ resource, pagination, filters }) => {
+      const page: number = pagination?.currentPage ?? 1;
+      const pageSize: number = pagination?.pageSize ?? 10;
+      const params: Record<string, string | number> = { page, limit: pageSize };
 
-    // FILTERING
-    if (filters) {
-      filters.forEach((filter) => {
-        if (
-          "field" in filter &&
-          filter.field === "department" &&
-          filter.operator === "eq"
-        ) {
-          data = data.filter((item) => item.department === filter.value);
-        }
+      filters?.forEach((filter) => {
+        const field = "field" in filter ? filter.field : "";
+        const value = filter.value;
 
-        if (
-          "field" in filter &&
-          filter.field === "name" &&
-          filter.operator === "contains"
-        ) {
-          data = data.filter((item) =>
-            item.name
-              .toLowerCase()
-              .includes(String(filter.value).toLowerCase()),
-          );
+        if (resource === "subjects") {
+          if (field === "department" || field === "department.code")
+            params.department = value;
+          if (field === "name" || field === "code") params.search = value;
         }
       });
-    }
 
-    // SORTING
-    if (sorters?.length) {
-      const sorter = sorters[0];
-      data.sort((a, b) => {
-        const aValue = a[sorter.field as keyof Subject];
-        const bValue = b[sorter.field as keyof Subject];
+      return params;
+    },
 
-        if (aValue === null && bValue === null) return 0;
-        if (aValue === null) return sorter.order === "asc" ? 1 : -1;
-        if (bValue === null) return sorter.order === "asc" ? -1 : 1;
-        if (aValue < bValue) return sorter.order === "asc" ? -1 : 1;
-        if (aValue > bValue) return sorter.order === "asc" ? 1 : -1;
-        return 0;
-      });
-    }
+    mapResponse: async (response) => {
+      const payload: ListResponse = await response.json();
+      return payload.data ?? [];
+    },
 
-    // PAGINATION
-    const current = pagination?.currentPage || 1;
-    const pageSize = pagination?.pageSize || 10;
-    const start = (current - 1) * pageSize;
-    const end = start + pageSize;
-
-    const paginatedData = data.slice(start, end);
-
-    return {
-      data: paginatedData as unknown as TData[],
-      total: data.length,
-    };
+    getTotalCount: async (response) => {
+      const payload: ListResponse = await response.json();
+      return payload.pagination?.total ?? payload.data?.length ?? 0;
+    },
   },
-
-  getOne: async () => {
-    throw new Error("This function not present in mock");
-  },
-
-  create: async () => {
-    throw new Error("This function not present in mock");
-  },
-
-  update: async () => {
-    throw new Error("This function not present in mock");
-  },
-
-  deleteOne: async () => {
-    throw new Error("This function not present in mock");
-  },
-
-  getApiUrl: () => "",
 };
+
+const { dataProvider } = createDataProvider(BACKEND_BASE_URL, options);
+
+export { dataProvider };

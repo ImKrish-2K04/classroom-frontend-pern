@@ -46,6 +46,11 @@ function App() {
                 create: "/subjects/create",
                 meta: { label: "Subjects", icon: <BookOpen /> },
               },
+              {
+                name: "departments",
+                list: "/departments",
+                meta: { hide: true },
+              },
             ]}
           >
             <Routes>

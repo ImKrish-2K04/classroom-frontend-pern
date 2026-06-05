@@ -11,12 +11,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DEPARTMENT_OPTIONS } from "@/constants";
 import { Subject } from "@/types";
 import { useTable } from "@refinedev/react-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useList } from "@refinedev/core";
 
 const SubjectsList = () => {
   const [searchInput, setSearchInput] = useState("");
@@ -37,7 +37,7 @@ const SubjectsList = () => {
         ? []
         : [
             {
-              field: "department",
+              field: "department.code",
               operator: "eq" as const,
               value: selectedDepartment,
             },
@@ -59,49 +59,51 @@ const SubjectsList = () => {
     [searchQuery],
   );
 
+  const subjectColumns = useMemo<ColumnDef<Subject>[]>(
+    () => [
+      {
+        id: "code",
+        accessorKey: "code",
+        size: 100,
+        header: () => <p className="column-title">Code</p>,
+        cell: ({ getValue }) => <Badge>{getValue<string>()}</Badge>,
+      },
+      {
+        id: "name",
+        accessorKey: "name",
+        size: 200,
+        header: () => <p className="column-title">Name</p>,
+        cell: ({ getValue }) => (
+          <span className="text-foreground">{getValue<string>()}</span>
+        ),
+        filterFn: "includesString",
+      },
+      {
+        id: "department",
+        accessorKey: "department.name",
+        size: 150,
+        header: () => <p className="column-title">Department</p>,
+        cell: ({ getValue }) => (
+          <Badge variant={"secondary"}>{getValue<string>()}</Badge>
+        ),
+      },
+      {
+        id: "description",
+        accessorKey: "description",
+        size: 300,
+        header: () => <p className="column-title">Description</p>,
+        cell: ({ getValue }) => (
+          <span className="text-foreground truncate sm:whitespace-normal sm:line-clamp-2">
+            {getValue<string>()}
+          </span>
+        ),
+      },
+    ],
+    [],
+  );
+
   const subjectTable = useTable<Subject>({
-    columns: useMemo<ColumnDef<Subject>[]>(
-      () => [
-        {
-          id: "code",
-          accessorKey: "code",
-          size: 100,
-          header: () => <p className="ml-2 column-title">Code</p>,
-          cell: ({ getValue }) => <Badge>{getValue<string>()}</Badge>,
-        },
-        {
-          id: "name",
-          accessorKey: "name",
-          size: 200,
-          header: () => <p className="column-title">Name</p>,
-          cell: ({ getValue }) => (
-            <span className="text-foreground">{getValue<string>()}</span>
-          ),
-          filterFn: "includesString",
-        },
-        {
-          id: "department",
-          accessorKey: "department",
-          size: 150,
-          header: () => <p className="column-title">Department</p>,
-          cell: ({ getValue }) => (
-            <Badge variant={"secondary"}>{getValue<string>()}</Badge>
-          ),
-        },
-        {
-          id: "description",
-          accessorKey: "description",
-          size: 300,
-          header: () => <p className="column-title">Description</p>,
-          cell: ({ getValue }) => (
-            <span className="text-foreground truncate sm:whitespace-normal sm:line-clamp-2">
-              {getValue<string>()}
-            </span>
-          ),
-        },
-      ],
-      [],
-    ),
+    columns: subjectColumns,
     refineCoreProps: {
       resource: "subjects",
       pagination: { pageSize: 10, mode: "server" },
@@ -113,6 +115,25 @@ const SubjectsList = () => {
       },
     },
   });
+
+  type Departments = {
+    code: string;
+    name: string;
+  };
+
+  const { result } = useList<Departments>({
+    resource: "departments",
+    pagination: { pageSize: 100 },
+  });
+
+  const departments = result?.data ?? [];
+  const departmentsOptions =
+    departments.length > 0
+      ? departments.map((d) => ({
+          label: d.name,
+          value: d.code,
+        }))
+      : [];
 
   return (
     <ListView>
@@ -148,7 +169,7 @@ const SubjectsList = () => {
 
               <SelectContent>
                 <SelectItem value="all">All Departments</SelectItem>
-                {DEPARTMENT_OPTIONS.map((department) => (
+                {departmentsOptions.map((department) => (
                   <SelectItem key={department.value} value={department.value}>
                     {department.label}
                   </SelectItem>
