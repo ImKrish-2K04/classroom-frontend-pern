@@ -193,6 +193,15 @@ body {
 }
 
 @layer components {
+  .no-spinner {
+    appearance: textfield;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      appearance: none;
+    }
+  }
+
   .page-title {
     @apply text-3xl font-bold text-foreground tracking-tight;
   }
