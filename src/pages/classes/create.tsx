@@ -56,7 +56,7 @@ const ClassesCreate = () => {
       status: "active",
       bannerUrl: "",
       bannerCldPubId: "",
-      inviteCode: "",
+      inviteCode: undefined,
       schedules: [],
     },
   });
@@ -70,8 +70,7 @@ const ClassesCreate = () => {
 
   const onSubmit = async (values: ClassInputType) => {
     try {
-      // await form.refineCore.onFinish(classSchema.parse(values));
-      console.log(values);
+      await form.refineCore.onFinish(values);
     } catch (error) {
       console.error("Error creating a new class", error);
     }

@@ -54,7 +54,7 @@ const UploadWidget = ({
       return true;
     };
 
-    if (!initializeWidget()) return;
+    if (initializeWidget()) return;
 
     const intervalId = window.setInterval(() => {
       if (initializeWidget()) {
@@ -82,7 +82,7 @@ const UploadWidget = ({
           tabIndex={0}
           onClick={openWidget}
           onKeyDown={(e) => {
-            if (e.key === "enter") {
+            if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
               openWidget();
             }

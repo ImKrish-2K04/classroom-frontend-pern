@@ -12,7 +12,7 @@ import { useNotificationProvider } from "./components/refine-ui/notification/use
 import { ThemeProvider } from "./components/refine-ui/theme/theme-provider";
 import { dataProvider } from "./providers/data";
 import { Layout } from "@/components/refine-ui/layout/layout";
-import { BookOpen, Home, GraduationCap } from "lucide-react";
+import { BookOpen, Home, GraduationCap, School } from "lucide-react";
 import SubjectsList from "@/pages/subjects/list";
 import SubjectsCreate from "@/pages/subjects/create";
 import Dashboard from "@/pages/dashboard";
@@ -58,7 +58,7 @@ function App() {
                 name: "classes",
                 list: "/classes",
                 create: "/classes/create",
-                meta: { label: "Classes", icon: <GraduationCap /> },
+                meta: { label: "Classes", icon: <School /> },
               },
             ]}
           >
