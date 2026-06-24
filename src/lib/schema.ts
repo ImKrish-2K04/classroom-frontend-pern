@@ -30,29 +30,6 @@ export const scheduleSchema = z.object({
   day: z.string().min(1, { error: "day is required" }),
   startTime: z.string().min(1, { error: "start time is required" }),
   endTime: z.string().min(1, { error: "end time is required" }),
-
-  /* 
-  day: z.enum(
-    [
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-      "Sunday",
-    ],
-    {
-      error: "Please select a valid day",
-    },
-  ),
-  startTime: z
-    .string()
-    .regex(/^\d{2}:\d{2}$/, { error: "Invalid time format (HH:MM)" }),
-  endTime: z
-    .string()
-    .regex(/^\d{2}:\d{2}$/, { error: "Invalid time format (HH:MM)" }), 
-  */
 });
 
 export const classSchema = z.object({

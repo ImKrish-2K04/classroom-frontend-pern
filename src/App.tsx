@@ -60,6 +60,12 @@ function App() {
                 create: "/classes/create",
                 meta: { label: "Classes", icon: <School /> },
               },
+              {
+                name: "users",
+                list: "/users",
+                create: "/users/create",
+                meta: { hide: true },
+              },
             ]}
           >
             <Routes>

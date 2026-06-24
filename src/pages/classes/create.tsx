@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "@refinedev/react-hook-form";
 import {
   useBack,
-  useSelect,
+  useList,
   type BaseRecord,
   type HttpError,
 } from "@refinedev/core";
@@ -28,10 +28,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MOCK_TEACHERS } from "@/constants";
 import { Textarea } from "@/components/ui/textarea";
 import UploadWidget from "@/components/upload-widget";
-import { UploadWidgetValue } from "@/types";
+import { Subject, UploadWidgetValue, User } from "@/types";
 
 export type FieldType = {
   onChange: (value: string) => void;
@@ -76,15 +75,32 @@ const ClassesCreate = () => {
     }
   };
 
-  const { options: subjectOptions, query: subjectQuery } = useSelect({
+  const { query: subjectQuery } = useList<Subject>({
     resource: "subjects",
-    optionLabel: "name",
-    optionValue: "id",
     pagination: {
-      mode: "off",
-      pageSize: 1000,
+      pageSize: 100,
     },
   });
+
+  const { query: teacherQuery } = useList<User>({
+    resource: "users",
+    filters: [
+      {
+        field: "role",
+        operator: "eq",
+        value: "teacher",
+      },
+    ],
+    pagination: {
+      pageSize: 100,
+    },
+  });
+
+  const subjects = subjectQuery?.data?.data || [];
+  const teachers = teacherQuery?.data?.data || [];
+
+  const subjectsLoading = subjectQuery.isLoading;
+  const teachersLoading = teacherQuery.isLoading;
 
   const bannerPubId = watch("bannerCldPubId");
 
@@ -200,6 +216,7 @@ const ClassesCreate = () => {
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
+                          disabled={subjectsLoading}
                         >
                           <FormControl>
                             <SelectTrigger className="w-full">
@@ -208,7 +225,7 @@ const ClassesCreate = () => {
                           </FormControl>
 
                           <SelectContent>
-                            {subjectQuery?.isLoading ? (
+                            {subjectsLoading ? (
                               <SelectItem
                                 className="animate-pulse"
                                 value="loading"
@@ -216,12 +233,9 @@ const ClassesCreate = () => {
                                 Loading subjects...
                               </SelectItem>
                             ) : (
-                              subjectOptions.map((option) => (
-                                <SelectItem
-                                  key={option.value}
-                                  value={option.value as string}
-                                >
-                                  {option.label}
+                              subjects.map((subject) => (
+                                <SelectItem key={subject.id} value={subject.id}>
+                                  {subject.name}
                                 </SelectItem>
                               ))
                             )}
@@ -244,6 +258,7 @@ const ClassesCreate = () => {
                         <Select
                           onValueChange={(value) => field.onChange(value)}
                           defaultValue={field.value?.toString()}
+                          disabled={teachersLoading}
                         >
                           <FormControl>
                             <SelectTrigger className="w-full">
@@ -252,11 +267,20 @@ const ClassesCreate = () => {
                           </FormControl>
 
                           <SelectContent>
-                            {MOCK_TEACHERS.map((teacher) => (
-                              <SelectItem key={teacher.id} value={teacher.id}>
-                                {teacher.name}
+                            {teachersLoading ? (
+                              <SelectItem
+                                className="animate-pulse"
+                                value="loading"
+                              >
+                                Teachers loading...
                               </SelectItem>
-                            ))}
+                            ) : (
+                              teachers.map((teacher) => (
+                                <SelectItem key={teacher.id} value={teacher.id}>
+                                  {teacher.name}
+                                </SelectItem>
+                              ))
+                            )}
                           </SelectContent>
                         </Select>
                         <FormMessage className="min-h-5" />
