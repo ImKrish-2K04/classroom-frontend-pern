@@ -52,7 +52,6 @@ const ClassesCreate = () => {
       subjectId: "",
       teacherId: "",
       capacity: 1,
-      status: "active",
       bannerUrl: "",
       bannerCldPubId: "",
       inviteCode: undefined,
@@ -317,34 +316,6 @@ const ClassesCreate = () => {
                     )}
                   />
 
-                  {/* status */}
-                  <FormField
-                    control={control}
-                    name="status"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Status<span className="text-orange-600">*</span>
-                        </FormLabel>
-                        <Select
-                          onValueChange={(value) => field.onChange(value)}
-                          defaultValue={field.value?.toString()}
-                        >
-                          <FormControl>
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Select status" />
-                            </SelectTrigger>
-                          </FormControl>
-
-                          <SelectContent>
-                            <SelectItem value="active">Active</SelectItem>
-                            <SelectItem value="inactive">Inactive</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                 </div>
 
                 {/* description */}

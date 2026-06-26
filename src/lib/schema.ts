@@ -37,22 +37,18 @@ export const classSchema = z.object({
     .string()
     .min(2)
     .max(50, { error: "Class name must be 2-50 characters long" }),
-  description: z
-    .string()
-    .min(5, { error: "Class description must be at least 5 characters" }),
+  description: z.string().min(5, { error: "Class description must be at least 5 characters" }).optional(),
   subjectId: z.uuid({ error: "Invalid subject ID" }),
   teacherId: z.uuid({ error: "Invalid teacher ID" }),
   capacity: z.coerce
     .number()
     .min(1, { error: "Capacity must be at least 1" })
-    .max(60, { error: "Capacity must be at most 60" }),
-  status: z.enum(["active", "inactive"], {
-    error: "Please select a valid status",
-  }),
-  bannerUrl: z.url({ error: "Invalid banner URL" }),
-  bannerCldPubId: z.string().min(1, { error: "Banner reference is required" }),
+    .max(60, { error: "Capacity must be at most 60" })
+    .optional(),
+  bannerUrl: z.string().url({ error: "Invalid banner URL" }).optional(),
+  bannerCldPubId: z.string().optional(),
   inviteCode: z.string().min(6).optional(),
-  schedules: z.array(scheduleSchema).optional(),
+  schedules: z.array(scheduleSchema),
 });
 
 export const enrollmentSchema = z.object({
